@@ -3,7 +3,7 @@
 ## Implemented in this phase
 - Dedicated AI Study Studio route in the existing React app.
 - Browser-side material extraction for PDF, DOCX, text/Markdown/subtitle files, images (OCR), and sampled video frames (OCR).
-- Optional local text-generation model through Transformers.js using a quantized SmolLM2 360M model.
+- Optional local text-generation model through Transformers.js using a quantized SmolLM2 135M model.
 - Deterministic offline coach fallback when the model is not downloaded or cannot run.
 - Study modes: teach, explain simply, homework coach, quiz prompts, answer self-assessment and summarise.
 - Files are processed in the browser; this feature does not upload them to a StudentNetwork backend.
