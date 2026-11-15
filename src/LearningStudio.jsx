@@ -11,6 +11,8 @@ function cleanText(value) {
 }
 async function readPdf(file) {
   const pdfjs = await import('pdfjs-dist');
+  const workerUrl = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
+  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl.default;
   const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
   const pages = [];
   for (let i = 1; i <= Math.min(pdf.numPages, 18); i++) {
