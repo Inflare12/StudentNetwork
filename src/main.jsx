@@ -3,6 +3,8 @@ import{createRoot}from'react-dom/client';
 import{ArrowRight,Award,BookOpen,Brain,Check,CheckCircle2,ChevronRight,Compass,Copy,Flame,GraduationCap,Heart,Home as HomeIcon,Lightbulb,LockKeyhole,Menu,Plus,Rocket,ShieldCheck,Star,Target,Trophy,Users,Zap,Sparkles}from'lucide-react';
 import'./styles.css';
 import LearningStudio from './LearningStudio.jsx';
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));}
+
 const KEY='studentnetwork_v2';
 const missions=[
 {id:'m1',title:'Explain one difficult concept',detail:'Choose a topic from class and explain it in your own words in five sentences.',category:'Learning',xp:35,minutes:15,icon:BookOpen},
