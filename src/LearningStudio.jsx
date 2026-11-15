@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { BookOpen, Brain, CheckCircle2, FileText, Image as ImageIcon, Loader2, MessageCircle, Paperclip, Play, Send, Sparkles, Upload, Video, X } from 'lucide-react';
 import './learning.css';
 
-const MODEL_ID = 'onnx-community/SmolLM2-135M-Instruct-ONNX-MHA';
+const MODEL_ID = 'onnx-community/Qwen2.5-0.5B-Instruct-ONNX-MHA';
 const MODES = ['Teach me', 'Explain simply', 'Homework coach', 'Make a quiz', 'Assess my answer', 'Summarise'];
 const starter = [{ role: 'assistant', text: 'Hi! I’m your study coach. Add a chapter, syllabus, image, notes or video transcript, then tell me what you want to understand. I’ll guide you step by step instead of simply handing over homework answers.' }];
 
@@ -91,9 +91,20 @@ export default function LearningStudio() {
     setModelMessage('Downloading the optional quantized model to this device. The first download can be large and needs internet.');
     try {
       const { pipeline } = await import('@huggingface/transformers');
-      const generator = await pipeline('text-generation', MODEL_ID, { dtype: 'q4' });
+      let generator;
+      let backend = 'wasm';
+      if (typeof navigator !== 'undefined' && navigator.gpu) {
+        try {
+          generator = await pipeline('text-generation', MODEL_ID, { dtype: 'q4', device: 'webgpu' });
+          backend = 'webgpu';
+        } catch (webgpuError) {
+          generator = await pipeline('text-generation', MODEL_ID, { dtype: 'q4', device: 'wasm' });
+        }
+      } else {
+        generator = await pipeline('text-generation', MODEL_ID, { dtype: 'q4', device: 'wasm' });
+      }
       setModel(generator); setStatus('ready');
-      setModelMessage('Local model loaded. Prompts run on this device; there is no per-question AI API call.');
+      setModelMessage('Qwen2.5 0.5B loaded with 4-bit weights using ' + backend.toUpperCase() + '. Prompts run on this device; there is no per-question AI API call.');
     } catch (error) {
       setStatus('fallback'); setModelMessage('Model could not load on this browser/device. Offline study coach remains available. ' + (error?.message || ''));
     } finally { setBusy(false); }
@@ -118,8 +129,8 @@ export default function LearningStudio() {
       if (model) {
         const context = source ? '\n\nSTUDENT MATERIAL:\n' + source.slice(0, 6500) : '';
         const system = 'You are StudentNetwork, a patient and accurate tutor for school students aged 10 to 18. Use simple language first. Ground claims in supplied material when possible. Teach step by step, ask questions, give hints and check understanding. For homework, guide the student instead of simply completing assessed work. Mode: ' + mode + '. Keep the answer concise and age appropriate.';
-        const chat = [{ role: 'system', content: system + context }, ...nextMessages.slice(-6).map(m => ({ role: m.role, content: m.text }))];
-        const result = await model(chat, { max_new_tokens: 220, temperature: 0.65, do_sample: true });
+        const chat = [{ role: 'system', content: system + context }, ...nextMessages.slice(-4).map(m => ({ role: m.role, content: m.text }))];
+        const result = await model(chat, { max_new_tokens: 160, temperature: 0.55, do_sample: true });
         const generated = result?.[0]?.generated_text;
         answer = Array.isArray(generated) ? (generated[generated.length - 1]?.content || '') : String(generated || '');
         answer = answer.trim() || 'I could not produce an answer. Try asking in a shorter way.';
@@ -136,7 +147,7 @@ export default function LearningStudio() {
       <aside className="learning-tools">
         <div className="learning-card"><div className="learning-card-title"><Sparkles size={17}/><b>Choose a study mode</b></div><div className="learning-modes">{MODES.map(item => <button key={item} className={mode === item ? 'active' : ''} onClick={() => setMode(item)}>{item}</button>)}</div></div>
         <div className="learning-card"><div className="learning-card-title"><Paperclip size={17}/><b>Your materials</b></div><p className="learning-muted">Add a syllabus, chapter or lesson. Files are processed in this browser.</p><input ref={fileRef} className="file-hidden" type="file" accept=".pdf,.docx,.txt,.md,.csv,.json,.vtt,.srt,image/*,video/*" onChange={e => addFiles(e.target.files)}/><button className="upload-button" disabled={uploading} onClick={() => fileRef.current?.click()}>{uploading ? <Loader2 className="spin" size={16}/> : <Upload size={16}/>} {uploading ? 'Reading material…' : 'Upload a file'}</button>{sourceName && <div className="source-chip"><FileText size={14}/><span>{sourceName}</span><button aria-label="Remove material" onClick={() => {setSource('');setSourceName('')}}><X size={14}/></button></div>}<div className="file-support"><ImageIcon size={14}/> Images: OCR <Video size={14}/> Video: sampled frame text + subtitles <BookOpen size={14}/> PDF / DOCX / text</div></div>
-        <div className="learning-card model-card"><div className="learning-card-title"><Brain size={17}/><b>Private local AI</b></div><p className="learning-muted">{modelMessage}</p><button className="model-button" disabled={!!model || busy} onClick={loadModel}>{model ? <CheckCircle2 size={16}/> : <Play size={15}/>} {model ? 'Model ready on this device' : status === 'loading' ? 'Loading…' : 'Download free local model'}</button><small>No API key or per-question model fee. Download and device limits still apply.</small></div>
+        <div className="learning-card model-card"><div className="learning-card-title"><Brain size={17}/><b>Private local AI</b></div><p className="learning-muted">{modelMessage}</p><button className="model-button" disabled={!!model || busy} onClick={loadModel}>{model ? <CheckCircle2 size={16}/> : <Play size={15}/>} {model ? 'Model ready on this device' : status === 'loading' ? 'Loading…' : 'Download free local model'}</button><small>No API key or per-question model fee. Initial download, device memory and battery still matter.</small></div>
       </aside>
       <div className="learning-chat"><div className="chat-top"><div><b><Sparkles size={16}/> Study coach</b><small>{sourceName ? 'Using ' + sourceName : 'Add material to personalise your lesson'}</small></div><span className="local-badge">LOCAL FIRST</span></div>
         <div className="chat-messages">{messages.map((message, index) => <article className={'chat-message ' + message.role} key={index}><span className="message-avatar">{message.role === 'assistant' ? <Sparkles size={15}/> : 'You'}</span><div className="message-body"><b>{message.role === 'assistant' ? 'Study coach' : 'You'}</b><p>{message.text}</p></div></article>)}{busy && <div className="chat-thinking"><Loader2 className="spin" size={16}/> Thinking on this device…</div>}<div ref={endRef}/></div>
