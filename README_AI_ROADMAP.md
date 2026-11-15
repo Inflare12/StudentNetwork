@@ -25,3 +25,9 @@
 
 ## Ads and account eligibility
 AdSense publisher accounts require the publisher to be at least 18. A parent or guardian may apply with their own Google Account, and payments go to that adult. Review current policies before adding ad code. See Google's current publisher age requirements and child/teen ad protections.
+
+
+## Student privacy page
+- The app now explains which profile/progress fields are stored in browser localStorage, how selected files are processed locally, that the optional model is fetched from Hugging Face, and how to clear local app data.
+- The privacy page accurately states that accounts, shared profiles, messaging, analytics and ad scripts are not active in this starter version.
+- Re-review this notice before adding analytics, ads, accounts, social features or backend sync. Do not collect sensitive student information.
