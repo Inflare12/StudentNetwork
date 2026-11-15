@@ -9,7 +9,7 @@
 - Files are processed in the browser; this feature does not upload them to a StudentNetwork backend.
 
 ## Important limitations
-- Local model quality, speed, memory use and browser compatibility vary. The model must be downloaded to the student's device and the first download needs internet. The 0.5B size is a compromise for phones with around 8 GB total RAM; browser-tab memory limits vary and this does not guarantee it will run on every phone. There is no per-request AI provider bill, but bandwidth and hosting are not universally free.
+- Local model quality, speed, memory use and browser compatibility vary. The model must be downloaded to the student's device and the first download needs internet. The 135M size is chosen to reduce the first-download and runtime burden on phones with around 8 GB total RAM; browser-tab memory limits vary and this does not guarantee it will run on every phone. There is no per-request AI provider bill, but bandwidth and hosting are not universally free.
 - The small language model is not a frontier model and can hallucinate. Students should verify important answers.
 - Image understanding in this phase is OCR (text extraction), not full visual reasoning.
 - Video support samples four frames for visible text. It does not transcribe speech or understand all scenes. Upload a VTT or SRT subtitle/transcript file for text-based video context.
