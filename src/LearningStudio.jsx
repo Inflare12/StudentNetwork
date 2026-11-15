@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { BookOpen, Brain, CheckCircle2, FileText, Image as ImageIcon, Loader2, MessageCircle, Paperclip, Play, Send, Sparkles, Upload, Video, X } from 'lucide-react';
 import './learning.css';
 
-const MODEL_ID = 'onnx-community/SmolLM2-360M-Instruct';
+const MODEL_ID = 'onnx-community/SmolLM2-135M-Instruct-ONNX-MHA';
 const MODES = ['Teach me', 'Explain simply', 'Homework coach', 'Make a quiz', 'Assess my answer', 'Summarise'];
 const starter = [{ role: 'assistant', text: 'Hi! I’m your study coach. Add a chapter, syllabus, image, notes or video transcript, then tell me what you want to understand. I’ll guide you step by step instead of simply handing over homework answers.' }];
 
