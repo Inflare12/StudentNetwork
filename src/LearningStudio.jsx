@@ -117,11 +117,12 @@ export default function LearningStudio() {
       let answer;
       if (model) {
         const context = source ? '\n\nSTUDENT MATERIAL:\n' + source.slice(0, 6500) : '';
-        const history = nextMessages.slice(-6).map(m => (m.role === 'user' ? 'Student: ' : 'Tutor: ') + m.text).join('\n');
         const system = 'You are StudentNetwork, a patient and accurate tutor for school students aged 10 to 18. Use simple language first. Ground claims in supplied material when possible. Teach step by step, ask questions, give hints and check understanding. For homework, guide the student instead of simply completing assessed work. Mode: ' + mode + '. Keep the answer concise and age appropriate.';
-        const result = await model(system + context + '\n\n' + history + '\nTutor: ', { max_new_tokens: 220, temperature: 0.65, do_sample: true });
-        answer = result?.[0]?.generated_text || '';
-        answer = answer.split('\nTutor: ').pop().trim() || answer.trim();
+        const chat = [{ role: 'system', content: system + context }, ...nextMessages.slice(-6).map(m => ({ role: m.role, content: m.text }))];
+        const result = await model(chat, { max_new_tokens: 220, temperature: 0.65, do_sample: true });
+        const generated = result?.[0]?.generated_text;
+        answer = Array.isArray(generated) ? (generated[generated.length - 1]?.content || '') : String(generated || '');
+        answer = answer.trim() || 'I could not produce an answer. Try asking in a shorter way.';
       } else answer = fallbackReply(mode, prompt, source);
       setMessages(old => [...old, { role: 'assistant', text: answer }]);
       setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 60);
