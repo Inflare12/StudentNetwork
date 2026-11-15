@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import { pipeline } from '@huggingface/transformers';
 import { BookOpen, Brain, CheckCircle2, FileText, Image as ImageIcon, Loader2, MessageCircle, Paperclip, Play, Send, Sparkles, Upload, Video, X } from 'lucide-react';
 import './learning.css';
 
@@ -89,6 +88,7 @@ export default function LearningStudio() {
     setBusy(true); setStatus('loading');
     setModelMessage('Downloading the optional quantized model to this device. The first download can be large and needs internet.');
     try {
+      const { pipeline } = await import('@huggingface/transformers');
       const generator = await pipeline('text-generation', MODEL_ID, { dtype: 'q4' });
       setModel(generator); setStatus('ready');
       setModelMessage('Local model loaded. Prompts run on this device; there is no per-question AI API call.');
