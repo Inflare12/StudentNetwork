@@ -24,7 +24,7 @@ const level=x=>Math.floor(Math.sqrt(Math.max(0,x)/100))+1;
 function App(){
  const[data,setData]=useState(load),[page,setPage]=useState('home'),[menu,setMenu]=useState(false),[toast,setToast]=useState(''),[onboarding,setOnboarding]=useState(!load().profile);
  useEffect(()=>persist(data),[data]);
- useEffect(()=>{const t=today();if(data.lastVisit!==t){setData(d=>({...d,streak:d.lastVisit?d.streak+1:1,lastVisit:t,done:[]}));}},[]);
+ useEffect(()=>{const t=today();if(data.lastVisit!==t){const yday=new Date();yday.setDate(yday.getDate()-1);const y=yday.getFullYear()+'-'+String(yday.getMonth()+1).padStart(2,'0')+'-'+String(yday.getDate()).padStart(2,'0');setData(d=>({...d,streak:d.lastVisit===y?d.streak+1:1,lastVisit:t,done:[]}));}},[]);
  const notify=s=>{setToast(s);window.setTimeout(()=>setToast(''),2300)};
  const update=p=>setData(d=>({...d,...p}));
  const complete=m=>{if(data.done.includes(m.id))return notify('Already completed today.');setData(d=>({...d,done:[...d.done,m.id],xp:d.xp+m.xp}));notify('Completed · +'+m.xp+' XP')};
