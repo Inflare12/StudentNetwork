@@ -10,20 +10,22 @@ This checklist is for the reviewable MVP candidate targeted for 19 November 2026
 ## Core student flows
 - [ ] Fresh visitor can complete nickname-only onboarding.
 - [ ] Refresh preserves the local profile and progress.
+- [ ] With browser storage blocked, onboarding and the core app remain usable in-session and a clear warning explains that progress will not survive refresh.
 - [ ] Daily missions award XP once per mission and reset on the next local calendar day.
 - [ ] Skill selection, starter/custom projects and reflections save and reload.
 - [ ] Study templates produce the expected local prompts.
 - [ ] Privacy page accurately describes current storage and feature limits.
-- [ ] Clear-local-data control removes the local profile and returns to onboarding.
+- [ ] Clear-local-data control removes the local profile and returns to onboarding without recreating the saved profile key.
 
 ## AI Study Studio and files
+- [ ] AI Study Studio is loaded only when opened; the model is not fetched until the student explicitly taps download.
 - [ ] Rule-based fallback works without downloading a model.
 - [ ] Model download is opt-in and clearly states its approximate 182 MB size.
 - [ ] SmolLM2 runs on a real supported Android device; record browser, backend (WebGPU/WASM), load time and observed failures.
 - [ ] iOS Safari is tested separately; do not assume WebGPU support.
 - [ ] PDF, DOCX, TXT/Markdown/subtitles and image OCR are tested with sample files.
 - [ ] Video sampling is tested with a short supported video; explain that it does not transcribe audio.
-- [ ] Unsupported and oversized files fail with a readable message.
+- [ ] Confirm files up to 25 MB are handled and files above 25 MB fail with a readable message on desktop and phone.
 - [ ] Network inspection confirms selected document contents are not sent to a StudentNetwork backend.
 
 ## Mobile, accessibility and PWA
@@ -49,6 +51,7 @@ This checklist is for the reviewable MVP candidate targeted for 19 November 2026
 - Profile and progress are browser-local; there are no accounts or cross-device sync.
 - XP and mission completion are self-reported, not verified achievements.
 - Opportunities are categories to investigate, not confirmed open registrations.
+- File imports are capped at 25 MB to reduce memory pressure on phones.
 - The local language model is small and may be slow or inaccurate; important answers must be checked.
 - Image processing is OCR; video processing samples visible text and does not transcribe speech.
 - No real ads or monetisation are enabled.
