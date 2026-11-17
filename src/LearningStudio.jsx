@@ -58,7 +58,7 @@ async function readVideoFrames(file) {
 }
 async function extractFile(file) {
   const name = file.name.toLowerCase();
-  if (file.size > 80 * 1024 * 1024) throw new Error('Please choose a file smaller than 80 MB for this browser-based prototype.');
+  if (file.size > 25 * 1024 * 1024) throw new Error('Please choose a file smaller than 25 MB. Large PDFs, images and videos can use a lot of memory on phones.');
   if (file.type === 'application/pdf' || name.endsWith('.pdf')) return readPdf(file);
   if (name.endsWith('.docx')) return readDocx(file);
   if (file.type.startsWith('image/')) return readImage(file);
