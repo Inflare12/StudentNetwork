@@ -3,7 +3,8 @@
 This checklist is for the reviewable MVP candidate targeted for 19 November 2026. A checked item means it was actually tested; a successful deployment alone does not prove the user flows work.
 
 ## Automated checks
-- [ ] GitHub Actions production build passes on the release-candidate commit.
+- [ ] GitHub Actions Node unit tests and production build pass on the release-candidate commit.
+- [ ] Automated media-event tests cover video metadata success, media errors and seek timeouts.
 - [ ] Vercel preview deployment for the same commit reaches READY.
 - [ ] No build errors or unresolved high-priority runtime errors.
 
@@ -24,7 +25,8 @@ This checklist is for the reviewable MVP candidate targeted for 19 November 2026
 - [ ] SmolLM2 runs on a real supported Android device; record browser, backend (WebGPU/WASM), load time and observed failures.
 - [ ] iOS Safari is tested separately; do not assume WebGPU support.
 - [ ] PDF, DOCX, TXT/Markdown/subtitles and image OCR are tested with sample files.
-- [ ] Video sampling is tested with a short supported video; explain that it does not transcribe audio.
+- [ ] Video sampling is tested with a short supported video; metadata and seek failures show a readable message rather than leaving the upload spinner running.
+- [ ] Explain that video sampling does not transcribe audio.
 - [ ] Confirm files up to 25 MB are handled and files above 25 MB fail with a readable message on desktop and phone.
 - [ ] Network inspection confirms selected document contents are not sent to a StudentNetwork backend.
 

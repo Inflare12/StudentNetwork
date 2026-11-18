@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { BookOpen, Brain, CheckCircle2, FileText, Image as ImageIcon, Loader2, MessageCircle, Paperclip, Play, Send, Sparkles, Upload, Video, X } from 'lucide-react';
 import './learning.css';
+import { waitForMediaEvent } from './mediaEvents.js';
 
 const MODEL_ID = 'onnx-community/SmolLM2-135M-Instruct-ONNX-MHA';
 const MODES = ['Teach me', 'Explain simply', 'Homework coach', 'Make a quiz', 'Assess my answer', 'Summarise'];
@@ -35,26 +36,49 @@ async function readImage(file) {
 async function readVideoFrames(file) {
   const url = URL.createObjectURL(file);
   const video = document.createElement('video');
-  video.preload = 'metadata'; video.muted = true; video.src = url;
   try {
-    await new Promise((resolve, reject) => { video.onloadedmetadata = resolve; video.onerror = () => reject(new Error('This video could not be opened by your browser.')); });
+    const metadataReady = waitForMediaEvent(video, 'loadedmetadata', {
+      timeoutMs: 15000,
+      timeoutMessage: 'This video took too long to open. Try a shorter clip or a different format.'
+    });
+    video.preload = 'metadata';
+    video.muted = true;
+    video.src = url;
+    await metadataReady;
+
     const duration = Number.isFinite(video.duration) ? video.duration : 0;
     if (!duration) return 'Video opened, but its duration could not be read.';
+    if (duration < 0.5) return 'This video is too short for reliable frame sampling. Add captions or a transcript instead.';
+
     const tesseract = await import('tesseract.js');
     const worker = await tesseract.createWorker('eng');
-    const canvas = document.createElement('canvas'); canvas.width = 960; canvas.height = 540;
-    const ctx = canvas.getContext('2d'); const captured = [];
+    const canvas = document.createElement('canvas');
+    canvas.width = 960;
+    canvas.height = 540;
+    const ctx = canvas.getContext('2d');
+    const captured = [];
     try {
       for (const fraction of [0.08, 0.3, 0.55, 0.8]) {
-        video.currentTime = Math.min(Math.max(0, duration * fraction), Math.max(0, duration - 0.15));
-        await new Promise(resolve => { video.onseeked = resolve; });
+        const targetTime = Math.min(Math.max(0, duration * fraction), Math.max(0, duration - 0.15));
+        const seekReady = waitForMediaEvent(video, 'seeked', {
+          timeoutMs: 10000,
+          timeoutMessage: 'The browser could not reach a video frame in time. Try a shorter or different video.'
+        });
+        video.currentTime = targetTime;
+        await seekReady;
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const text = (await worker.recognize(canvas)).data.text.trim();
         if (text) captured.push('Frame near ' + Math.round(video.currentTime) + 's: ' + text);
       }
-    } finally { await worker.terminate(); }
-    return captured.length ? captured.join('\n\n') : 'No readable on-screen text was found in sampled frames. Add captions or a transcript file for a content-aware lesson.';
-  } finally { URL.revokeObjectURL(url); video.removeAttribute('src'); video.load(); }
+    } finally {
+      await worker.terminate();
+    }
+    return captured.length ? captured.join('\\n\\n') : 'No readable on-screen text was found in sampled frames. Add captions or a transcript file for a content-aware lesson.';
+  } finally {
+    URL.revokeObjectURL(url);
+    video.removeAttribute('src');
+    video.load();
+  }
 }
 async function extractFile(file) {
   const name = file.name.toLowerCase();
