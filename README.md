@@ -1,17 +1,38 @@
 # StudentNetwork
 
-StudentNetwork is a student growth workspace for ages 10–18. The current MVP focuses on small, useful actions rather than an endless feed.
+StudentNetwork is a mobile-first student growth workspace for ages 10–18. This repository contains an early, browser-local MVP for a review launch targeted for 20 November 2026. It is **not** a shared social network or a fully reviewed service for children.
 
-## Included in this MVP
+## What is included
 
-- Nickname-only onboarding with broad age bands and daily time preference.
-- Daily missions across learning, thinking, creativity, communication, collaboration, discovery and projects.
-- XP, levels, daily completion tracking and a streak indicator.
-- Skill-interest selection.
-- Starter project roadmaps and a private portfolio with reflections.
-- Opportunity discovery categories with explicit eligibility-verification reminders.
-- Shareable challenge prompts.
-- Offline study templates (revision checklist, flashcard prompts and practice prompts).
+- Nickname-only onboarding with an age band, goal and daily time preference.
+- Dashboard, daily missions, self-reported XP/levels/streaks and skill interests.
+- Starter project roadmaps, private browser-local reflections and portfolio notes.
+- Opportunity categories with reminders to verify eligibility and dates with an adult; these are not live listings.
+- Copyable friend-challenge prompts; these do not create rooms or shared activity.
+- Study templates and an optional AI Study Studio.
+
+## AI Study Studio and file imports
+
+The Study Studio has two paths:
+
+1. **No-model study coach:** a deterministic, rule-based fallback for study prompts, quizzes, summaries and homework coaching. It is not generative AI.
+2. **Optional on-device model:** SmolLM2-135M-Instruct ONNX MHA, 4-bit (q4), approximately 182 MB. The app attempts WebGPU and falls back to WASM. The model is fetched only after the student explicitly presses the download button. It is a very small model and can be slow, inaccurate or unsupported on some devices. Actual Android/iOS inference has not been certified.
+
+There is no per-question hosted AI API call, but downloads still use network data and hosting/CDN bandwidth. Model files may be cached by the browser and are not removed by the in-app profile-clearing control.
+
+The Study Studio accepts PDF (up to the first 18 pages are extracted), DOCX, TXT/Markdown/CSV/JSON, VTT/SRT subtitles, images and browser-playable videos. The upload limit is 25 MB. Image and sampled video-frame processing use English OCR. Video processing samples a few frames for visible text; it does **not** transcribe speech or understand the full scene. OCR may fetch language resources from a third-party content host.
+
+Selected document contents are processed in the browser; this version has no StudentNetwork upload endpoint or student database. Browser/device memory, third-party resource downloads and model compatibility still matter.
+
+## Data, privacy and safety
+
+- There are no online accounts, authentication, shared database, cross-device sync, public profiles, direct messages, live leaderboards or real-time challenge rooms.
+- Profile details, age band, goal, daily time preference, XP, streak, completed missions, selected skills, project notes and reflections are stored in this browser's localStorage.
+- Anyone with access to the browser profile/device may be able to see this local information. Browser settings or clearing site data can remove it.
+- The in-app clear-data action removes the StudentNetwork profile/progress key and returns to onboarding; it does not clear the browser-managed model cache.
+- No advertising scripts or analytics are enabled. The long-term business direction may be free-to-use and ad-supported, but advertising and revenue are **not** launch-ready.
+
+Use a nickname only. Do not enter real names, school names, phone numbers, home addresses, passwords, private records or information about another person. Because the intended audience includes minors, a parent/guardian and appropriate adult policy/privacy review is required before a public service or any monetisation is approved. Do not add accounts, student-data collection, ads or a backend without an explicit product/privacy decision and suitable consent, moderation, reporting, retention and deletion controls.
 
 ## Run locally
 
@@ -20,46 +41,27 @@ npm install
 npm run dev
 \`\`\`
 
-Build:
+Run automated tests and create a production build:
 
 \`\`\`bash
+npm test
 npm run build
 \`\`\`
 
-## Zero-cost architecture
+The app uses Vite + React and a static client-side deployment. No paid inference service, database or server-side model is configured. Dependency versions are not fully pinned and no lockfile is committed in this MVP, so a future install may resolve different package versions; run CI and review dependency changes before relying on a rebuilt release.
 
-This version is deliberately static and client-side:
-- Vite + React for the app.
-- Vercel static hosting.
-- Browser localStorage for the current device's demo profile and progress.
-- No AI API, paid inference, database, email login or server-side model.
-- Study prompts are deterministic templates, not AI-generated answers.
+## Honest MVP limitations
 
-This avoids API bills and keeps the first experiment inexpensive. It also means progress does **not** sync across devices or between students. A browser-local XP score is self-reported and must not be treated as a verified achievement.
+- XP and mission completion are self-reported motivation features, not verified achievements.
+- Opportunities are examples/categories to investigate, not confirmed open registrations.
+- The offline study fallback is rule-based, not generative AI.
+- The optional 135M model is limited; important answers must be checked against textbooks or teachers.
+- OCR is not full image understanding; video sampling is not speech transcription.
+- PWA app-shell caching is best-effort after a successful visit. It does not guarantee offline model or OCR-resource availability.
+- Real-device browser flows, accessibility, model inference and offline behaviour still require Android/iOS and assistive-technology testing.
 
-## AI without per-request API costs
-
-Do not try to host a language model inside a Vercel serverless function for this first release. Serverless functions have execution, memory, bundle and cold-start constraints; model inference can be slow and expensive in compute even when no external model API is called.
-
-A later experiment can use a small quantized model in the browser through WebGPU/WebAssembly (for example, a Transformers.js-compatible ONNX model). The model is downloaded to each student's device and inference happens locally:
-- no per-token provider bill;
-- no model inference server to pay for;
-- user-device performance and memory become the limits;
-- first download can be large, and low-end phones may struggle.
-
-Before adding a local model, test it on budget Android phones and provide a no-model fallback. For missions, recommendations and progress summaries, deterministic rules may be better, faster and more reliable than an LLM.
-
-## Important production limitations
-
-This is an early product-validation MVP, not a fully shared student network:
-- Profile, XP, selected skills, projects and reflections are stored only in the current browser.
-- There is no real authentication, shared database, live multiplayer, real-time leaderboard, file upload or cross-device sync.
-- Challenge sharing copies a prompt; it does not create a live room.
-- Opportunity cards are categories to investigate, not live or verified listings.
-- Mission completion is self-reported. XP is for motivation, not certification.
-
-Do not collect full names, home addresses, phone numbers, school email addresses or other sensitive information in this prototype. Before introducing accounts, uploads, messaging, public profiles or leaderboards for minors, implement appropriate consent, privacy controls, moderation, reporting, retention and deletion processes.
+See [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md) for the release verification record and outstanding checks.
 
 ## Product principle
 
-Reward meaningful progress, not app opens. Keep challenges age-appropriate, make personal progress more important than public rankings, and let students participate without sharing personal information.
+Reward meaningful progress, not app opens. Keep personal progress private, avoid pressure from public rankings, and do not ask students to disclose more personal information than the MVP needs.
