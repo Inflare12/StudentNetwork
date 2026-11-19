@@ -8,7 +8,10 @@ This checklist records the reviewable MVP candidate targeted for 19 November 202
 - Application-code baseline: `0e690909af87ec3520aec95c718ed008b7525986` (`fix: prevent video imports from hanging on stalled seeks`).
 - GitHub Actions run [#17](https://github.com/Inflare12/StudentNetwork/actions/runs/44237045304) completed successfully on that application-code commit. Its Production build job completed dependency installation, `npm test` and `npm run build`.
 - Vercel preview for that same application-code commit reached READY: https://studentnetwork-lnxw2rt0f-inflare-s-projects.vercel.app
-- The README was corrected on 19 November to describe the shipped local AI, file-import, privacy and model limitations accurately. The final documentation-only PR head still requires its own CI and preview confirmation before it can be called the exact release candidate.
+- The README was corrected on 19 November to describe the shipped local AI, file-import, privacy and model limitations accurately.
+- The documentation-only PR head `db2de01449d43670c802db7e8b72f7e39123e714` passed GitHub Actions [run #21](https://github.com/Inflare12/StudentNetwork/actions/runs/44454455149) and its Vercel preview reached READY: https://studentnetwork-nkdkgcu5j-inflare-s-projects.vercel.app
+- Vercel's aggregate runtime-error query found no error clusters in the selected 24-hour window. This does not replace interactive smoke tests.
+- This checklist refresh is itself documentation-only. The exact resulting PR head SHA and its preview URL are maintained in the PR description after this final-head check.
 
 ### Build warnings observed in Vercel logs
 
@@ -27,8 +30,9 @@ No evidence from this build proves that the model or OCR assets are downloaded d
 - [x] GitHub Actions Node unit tests and production build pass on application-code baseline `0e690909` (run #17).
 - [x] Automated media-event helper tests cover successful event, browser error and timeout paths on that baseline.
 - [x] Vercel preview for the same application-code baseline reached READY.
-- [ ] GitHub Actions and Vercel preview for the final 19 November documentation-only PR head are confirmed.
-- [ ] No unresolved high-priority runtime errors; this requires interactive browser checks and cannot be inferred from build logs.
+- [x] GitHub Actions run #21 and Vercel READY preview confirmed for documentation-only head `db2de014`.
+- [x] Vercel aggregate runtime-error query returned no error clusters in the selected 24-hour window.
+- [ ] Interactive browser smoke tests have not been completed; absence of aggregated runtime errors is not proof that flows work.
 
 ## Core student flows
 
@@ -73,7 +77,7 @@ No evidence from this build proves that the model or OCR assets are downloaded d
 ## Release decision
 
 - [x] On 19 November, feature scope was frozen; remaining work is verification and documentation only.
-- [ ] Publish the exact final preview URL and commit SHA for the user's inspection after final-head CI and deployment complete.
+- [x] The PR description records the exact verified PR-head SHA and preview URL for inspection; it is refreshed after the final documentation-only head passes CI and Vercel.
 - [ ] Do not describe the product as cleared for unrestricted public launch until core browser/device checks and adult/guardian privacy review are complete.
 - [ ] Launch on 20 November only as a clearly described MVP if the responsible adult accepts the outstanding limitations and all required checks are completed.
 
