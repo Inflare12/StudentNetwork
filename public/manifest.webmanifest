@@ -1,0 +1,13 @@
+{
+  "name": "StudentNetwork",
+  "short_name": "StudentNetwork",
+  "description": "Learn, build and grow — one small step at a time.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#171d39",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
